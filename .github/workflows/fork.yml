@@ -47,5 +47,5 @@ jobs:
           else
             git commit -m "Automated backup $(date +'%Y-%m-%d %H:%M:%S')"
           fi
-          git remote set-url origin https://x-access-token:${PAT}@github.com/smjcxf/pz.git
+          git remote set-url origin https://x-access-token:${PAT}@github.com/smjcxf/wechat_for_handsome.git
           git push origin main    
