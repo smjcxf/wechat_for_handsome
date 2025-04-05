@@ -15,16 +15,20 @@ jobs:
         with:
           token: ${{ secrets.PAT }}
           
-      - name: Clone ACL4SSR_ACL4SSR
+      - name: Clone and Move Repositories
         run: |
-          git clone --depth=1 --branch master https://github.com/CuiCuiSha233/wechat_for_handsome
-          if [ -d "wechat_for_handsome(CuiCuiSha233)" ]; then
-          rm -rf "wechat_for_handsome(CuiCuiSha233)"
-          fi
-          mkdir -p "wechat_for_handsome(CuiCuiSha233)"
-          mv wechat_for_handsome_CuiCuiSha233/* "wechat_for_handsome(CuiCuiSha233)/"
-          rm -rf wechat_for_handsome_CuiCuiSha233
-              
+          clone_and_move() {
+            local repo_url=$1
+            local temp_dir=$2
+            local target_dir=$3
+            git clone --depth=1 $repo_url $temp_dir
+            rm -rf "$target_dir"
+            mkdir -p "$target_dir"
+            mv $temp_dir/* "$target_dir/"
+            rm -rf $temp_dir
+          }
+
+          clone_and_move "https://github.com/CuiCuiSha233/wechat_for_handsome -b master" "CuiCuiSha233_wechat_for_handsome" "wechat_for_handsome(CuiCuiSha233)"
       - name: Update timestamp
         run: echo "Backup run at $(date)" > backup-timestamp.txt
         
@@ -44,4 +48,4 @@ jobs:
             git commit -m "Automated backup $(date +'%Y-%m-%d %H:%M:%S')"
           fi
           git remote set-url origin https://x-access-token:${PAT}@github.com/smjcxf/pz.git
-          git push origin main
+          git push origin main    
