@@ -1,0 +1,47 @@
+name: Backup Repositories
+
+on:
+  schedule:
+    - cron: '0 */2 * * *'  
+  workflow_dispatch:
+  
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Backup Repository
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.PAT }}
+          
+      - name: Clone ACL4SSR_ACL4SSR
+        run: |
+          git clone --depth=1 --branch master https://github.com/CuiCuiSha233/wechat_for_handsome
+          if [ -d "wechat_for_handsome(CuiCuiSha233)" ]; then
+          rm -rf "wechat_for_handsome(CuiCuiSha233)"
+          fi
+          mkdir -p "wechat_for_handsome(CuiCuiSha233)"
+          mv wechat_for_handsome_CuiCuiSha233/* "wechat_for_handsome(CuiCuiSha233)/"
+          rm -rf wechat_for_handsome_CuiCuiSha233
+              
+      - name: Update timestamp
+        run: echo "Backup run at $(date)" > backup-timestamp.txt
+        
+      - name: Commit and Push Changes
+        env:
+          PAT: ${{ secrets.PAT }}
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          if git diff-index --quiet HEAD; then
+            echo "No changes detected, adding timestamp file."
+            echo "Backup run at $(date)" > backup-timestamp.txt
+            git add backup-timestamp.txt
+            git commit -m "$(date +'%Y-%m-%d %H:%M:%S')"
+          else
+            git commit -m "Automated backup $(date +'%Y-%m-%d %H:%M:%S')"
+          fi
+          git remote set-url origin https://x-access-token:${PAT}@github.com/smjcxf/pz.git
+          git push origin main
